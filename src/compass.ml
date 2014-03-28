@@ -1,4 +1,4 @@
-(* Random.self_init (); *)
+Random.self_init ();
 
 type direction = [= `n | `ne | `e | `se | `s | `sw | `w | `nw ];
 
@@ -27,6 +27,7 @@ class compass () =
 		value directionIndx = Random.int 1000 mod directionsNum;
 		value roratable = Sprite.create ();
 		value mutable state = `released;
+		value mutable answer = None;
 
 		initializer
 			(
@@ -59,14 +60,19 @@ class compass () =
 										(
 											tlf#setPos x y;
 											self#addChild tlf;
+											tlf;
 										)
 								in
 									(
 (* 														for i = 0 to directionsNum - 1 do {
 											makeLabel i;
 										}; *)
-										(* makeLabel 0; *)
-										makeLabel dotRand;
+										let a = makeLabel 0 in
+											(
+												answer := Some a;
+												a#setVisible False;
+											);
+										ignore(makeLabel dotRand);
 									);
 									
 								(* }; *)
@@ -77,7 +83,15 @@ class compass () =
 		method select () = img#setFilters [ Filters.glow 0xffff00 ];
 		method deselect () = img#setFilters [];
 		method correct () = ( self#setTouchable False; img#setFilters [ Filters.glow 0x00ff00 ]; );
-		method wrong () = ( self#setTouchable False; img#setFilters [ Filters.glow 0xff0000 ]; );
+		method wrong () =
+			(
+				self#setTouchable False;
+				img#setFilters [ Filters.glow 0xff0000 ];
+				match answer with
+				[ Some a -> a#setVisible True
+				| _ -> ()
+				];
+			);
 
 		method! width = img#width;
 		method! height = img#height;
