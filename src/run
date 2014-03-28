@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./compass.byte -w 1280 -h 800
