@@ -104,6 +104,8 @@ let stage w h =
 
 		value bgColor = 0xcccccc;
 		value mutable selectedCompass = None;
+		value mutable startTime = 0.;
+		value mutable complete = 0;
 
 		initializer
 			(
@@ -169,9 +171,21 @@ let stage w h =
 												match selectedCompass with
 												[ Some sc ->
 													(
+														if startTime = 0.
+														then startTime := Unix.time ()
+														else ();
+
 														if sc#direction = d
 														then sc#correct ()
 														else sc#wrong ();
+
+														complete := complete + 1;
+														if complete = rows * cols
+														then
+															let time = Unix.gmtime (Unix.time () -. startTime) in
+															let (_, tlf) = TLF.create (TLF.p ~fontSize:20 [ `text (Printf.sprintf "%d min %d sec" time.Unix.tm_min time.Unix.tm_sec) ]) in
+																self#addChild tlf
+														else ();
 
 														selectedCompass := None;
 													)
